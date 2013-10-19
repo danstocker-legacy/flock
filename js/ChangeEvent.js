@@ -21,6 +21,16 @@ troop.postpone(flock, 'ChangeEvent', function () {
         .addConstants(/** @lends flock.ChangeEvent */{
             EVENT_NAME_CHANGE: 'eventChange'
         })
+        .addPrivateMethods(/** @lends flock.ChangeEvent# */{
+            /**
+             * Updates flags to reflect the current before-after values.
+             * @private
+             */
+            _updateFlags: function () {
+                this.data.isInsert = this.isInsert();
+                this.data.isDelete = this.isDelete();
+            }
+        })
         .addMethods(/** @lends flock.ChangeEvent# */{
             /**
              * @param {evan.EventSpace} eventSpace Event space associated with event
@@ -46,6 +56,7 @@ troop.postpone(flock, 'ChangeEvent', function () {
              */
             setBefore: function (value) {
                 this.data.before = value;
+                this._updateFlags();
                 return this;
             },
 
@@ -56,6 +67,7 @@ troop.postpone(flock, 'ChangeEvent', function () {
              */
             setAfter: function (value) {
                 this.data.after = value;
+                this._updateFlags();
                 return this;
             },
 
