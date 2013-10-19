@@ -237,4 +237,93 @@
     });
 
     // TODO: Add test case for .unsetPath w/ splice
+
+    test("Subscription proxy", function () {
+        expect(4);
+
+        var tree = flock.EventedTree.create(),
+            result;
+
+        evan.EventSpace.addMocks({
+            subscribeTo: function (eventName, eventPath, handler) {
+                equal(eventName, 'eventName');
+                equal(eventPath, 'eventPath');
+                equal(handler, 'handler');
+            }
+        });
+
+        result = tree.subscribeTo('eventName', 'eventPath', 'handler');
+
+        strictEqual(result, tree, "Is chainable");
+
+        evan.EventSpace.removeMocks();
+    });
+
+    test("Unsubscription proxy", function () {
+        expect(4);
+
+        var tree = flock.EventedTree.create(),
+            result;
+
+        evan.EventSpace.addMocks({
+            unsubscribeFrom: function (eventName, eventPath, handler) {
+                equal(eventName, 'eventName');
+                equal(eventPath, 'eventPath');
+                equal(handler, 'handler');
+            }
+        });
+
+        result = tree.unsubscribeFrom('eventName', 'eventPath', 'handler');
+
+        strictEqual(result, tree, "Is chainable");
+
+        evan.EventSpace.removeMocks();
+    });
+
+    test("Unsubscription proxy", function () {
+        expect(4);
+
+        var tree = flock.EventedTree.create(),
+            oneTimeHandler = function () {},
+            result;
+
+        evan.EventSpace.addMocks({
+            subscribeToUntilTriggered: function (eventName, eventPath, handler) {
+                equal(eventName, 'eventName');
+                equal(eventPath, 'eventPath');
+                equal(handler, 'handler');
+                return oneTimeHandler;
+            }
+        });
+
+        result = tree.subscribeToUntilTriggered('eventName', 'eventPath', 'handler');
+
+        strictEqual(result, oneTimeHandler, "Returns handler");
+
+        evan.EventSpace.removeMocks();
+    });
+
+    test("Delegation proxy", function () {
+        expect(5);
+
+        var tree = flock.EventedTree.create(),
+            delegateHandler = function () {},
+            result;
+
+        evan.EventSpace.addMocks({
+            delegateSubscriptionTo: function (eventName, capturePath, delegatePath, handler) {
+                equal(eventName, 'eventName');
+                equal(capturePath, 'capturePath');
+                equal(delegatePath, 'delegatePath');
+                equal(handler, 'handler');
+                return delegateHandler;
+            }
+        });
+
+        result = tree.delegateSubscriptionTo('eventName', 'capturePath', 'delegatePath', 'handler');
+
+        strictEqual(result, delegateHandler, "Returns handler");
+
+        evan.EventSpace.removeMocks();
+    });
 }());

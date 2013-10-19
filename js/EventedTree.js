@@ -184,6 +184,56 @@ troop.postpone(flock, 'EventedTree', function () {
                 });
 
                 return this;
+            },
+
+            /**
+             * Event subscription proxy.
+             * @param {string} eventName
+             * @param {sntls.Path} eventPath
+             * @param {function} handler
+             * @return {flock.EventedTree}
+             * @see evan.EventSpace#subscribeTo
+             */
+            subscribeTo: function (eventName, eventPath, handler) {
+                this.eventSpace.subscribeTo(eventName, eventPath, handler);
+                return this;
+            },
+
+            /**
+             * Event unsubscription proxy.
+             * @param {string} eventName
+             * @param {sntls.Path} eventPath
+             * @param {function} [handler]
+             * @return {flock.EventedTree}
+             * @see evan.EventSpace#unsubscribeFrom
+             */
+            unsubscribeFrom: function (eventName, eventPath, handler) {
+                this.eventSpace.unsubscribeFrom(eventName, eventPath, handler);
+                return this;
+            },
+
+            /**
+             * One-time subscription proxy.
+             * @param {string} eventName
+             * @param {sntls.Path} eventPath
+             * @param {function} handler
+             * @return {function}
+             * @see evan.EventSpace#subscribeToUntilTriggered
+             */
+            subscribeToUntilTriggered: function (eventName, eventPath, handler) {
+                return this.eventSpace.subscribeToUntilTriggered(eventName, eventPath, handler);
+            },
+
+            /**
+             * Event delegation proxy.
+             * @param {string} eventName
+             * @param {sntls.Path} capturePath
+             * @param {sntls.Path} delegatePath
+             * @param {function} handler
+             * @return {function}
+             */
+            delegateSubscriptionTo: function (eventName, capturePath, delegatePath, handler) {
+                return this.eventSpace.delegateSubscriptionTo(eventName, capturePath, delegatePath, handler);
             }
         });
 });
