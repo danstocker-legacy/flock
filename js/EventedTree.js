@@ -187,3 +187,28 @@ troop.postpone(flock, 'EventedTree', function () {
             }
         });
 });
+
+(function () {
+    "use strict";
+
+    dessert.addTypes(/** @lends dessert */{
+        isEventedTree: function (expr) {
+            return flock.EventedTree.isBaseOf(expr);
+        },
+
+        isEventedTreeOptional: function (expr) {
+            return typeof expr === 'undefined' ||
+                   flock.EventedTree.isBaseOf(expr);
+        }
+    });
+
+    sntls.Hash.addMethods(/** @lends sntls.Hash# */{
+        /**
+         * Reinterprets hash as an evented tree.
+         * @returns {flock.EventedTree}
+         */
+        toEventedTree: function () {
+            return flock.EventedTree.create(this.items);
+        }
+    });
+}());

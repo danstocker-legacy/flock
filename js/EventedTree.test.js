@@ -11,6 +11,13 @@
         ok(tree.eventSpace.isA(evan.EventSpace), "Is event space");
     });
 
+    test("Type conversion", function () {
+        var hash = sntls.Hash.create(),
+            tree = hash.toEventedTree();
+
+        ok(tree.isA(flock.EventedTree), "Is evented tree");
+    });
+
     test("Get node", function () {
         expect(3);
 
