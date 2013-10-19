@@ -53,4 +53,32 @@
         ok(event.isInsert(), "Insert");
         ok(!event.isDelete(), "Insert not deletion");
     });
+
+    test("Triggering", function () {
+        expect(3);
+
+        var eventSpace = evan.EventSpace.create(),
+            event = flock.ChangeEvent.create(eventSpace)
+                .setBefore('hello')
+                .setAfter('world'),
+            result;
+
+        evan.Event.addMocks({
+            triggerSync: function (path, data) {
+                equal(path.toString(), 'foo>bar');
+                deepEqual(data, {
+                    before  : 'hello',
+                    after   : 'world',
+                    isInsert: false,
+                    isDelete: false
+                });
+            }
+        });
+
+        result = event.triggerSync('foo>bar'.toPath());
+
+        strictEqual(result, event, "Is chainable");
+
+        evan.Event.removeMocks();
+    });
 }());

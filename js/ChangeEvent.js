@@ -89,6 +89,15 @@ troop.postpone(flock, 'ChangeEvent', function () {
                 var data = this.data;
                 return typeof data.before !== 'undefined' &&
                        typeof data.after === 'undefined';
+            },
+
+            /**
+             * @param {sntls.Path} targetPath Path on which to trigger event.
+             * @return {flock.ChangeEvent}
+             */
+            triggerSync: function (targetPath) {
+                base.triggerSync.call(this, targetPath, this.data);
+                return this;
             }
         });
 });
