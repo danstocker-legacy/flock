@@ -92,3 +92,24 @@ troop.postpone(flock, 'ChangeEvent', function () {
             }
         });
 });
+
+(function () {
+    "use strict";
+
+    dessert.addTypes(/** @lends dessert */{
+        /**
+         * @param {flock.ChangeEvent} expr
+         */
+        isChangeEvent: function (expr) {
+            return flock.ChangeEvent.isBaseOf(expr);
+        },
+
+        /**
+         * @param {flock.ChangeEvent} expr
+         */
+        isChangeEventOptional: function (expr) {
+            return typeof expr === 'undefined' ||
+                   flock.ChangeEvent.isBaseOf(expr);
+        }
+    });
+}());

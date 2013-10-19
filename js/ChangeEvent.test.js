@@ -3,7 +3,7 @@
 (function () {
     "use strict";
 
-    module("Change EVent");
+    module("Change Event");
 
     test("Instantiation", function () {
         var eventSpace = evan.EventSpace.create(),
