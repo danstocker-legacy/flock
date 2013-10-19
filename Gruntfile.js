@@ -6,7 +6,8 @@ module.exports = function (grunt) {
         files: [
             'js/namespace.js',
             'js/ChangeEvent.js',
-            'js/AccessEvent.js'
+            'js/AccessEvent.js',
+            'js/EventedTree.js'
         ],
 
         test: [
