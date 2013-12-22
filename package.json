@@ -8,7 +8,7 @@
     "license"        : "MIT",
     "repository"     : {
         "type": "git",
-        "url" : "git://github.com/danstocker/jorder.git"
+        "url" : "git://github.com/danstocker/flock.git"
     },
     "dependencies"   : {
         "dessert": "~0.3.2",
