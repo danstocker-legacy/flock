@@ -13,6 +13,9 @@ troop.postpone(flock, 'EventedTree', function () {
      */
 
     /**
+     * Evented version of `sntls.Tree`. Whenever a node is changed (by value) the tree emits a `ChangeEvent`.
+     * When a node is attempted to be read but the path does not exist, an `AccessEvent` is emitted.
+     * Offers subscription methods. Works like `sntls.Tree` in all other regards.
      * @class
      * @extends sntls.Tree
      */
@@ -261,4 +264,18 @@ troop.postpone(flock, 'EventedTree', function () {
             return flock.EventedTree.create(this.items);
         }
     });
+
+    troop.Properties.addProperties.call(
+        Array.prototype,
+        /** @lends Array# */{
+            /**
+             * Creates a new EventedTree instance based on the current array.
+             * @returns {flock.EventedTree}
+             */
+            toEventedTree: function () {
+                return flock.EventedTree.create(this);
+            }
+        },
+        false, false, false
+    );
 }());

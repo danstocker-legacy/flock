@@ -18,6 +18,14 @@
         ok(tree.isA(flock.EventedTree), "Is evented tree");
     });
 
+    test("Array conversion", function () {
+        var buffer = [1, 2, 3, 4, 5],
+            tree = buffer.toEventedTree();
+
+        ok(tree.isA(flock.EventedTree), "Is evented tree");
+        strictEqual(tree.items, buffer, "Tree buffer");
+    });
+
     test("Get node", function () {
         expect(3);
 
