@@ -12,9 +12,9 @@
     },
     "dependencies"   : {
         "dessert": "~0.3.2",
-        "troop"  : "~0.7.0",
-        "sntls"  : "~0.15.0",
-        "evan"   : "~0.2.4"
+        "troop"  : "~0.7.1",
+        "sntls"  : "~0.16.0",
+        "evan"   : "~0.2.5"
     },
     "devDependencies": {
         "phil"                : "~0.2.3",
