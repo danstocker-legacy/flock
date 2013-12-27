@@ -241,6 +241,20 @@ troop.postpone(flock, 'EventedTree', function () {
         });
 });
 
+troop.amendPostponed(sntls, 'Hash', function () {
+   "use strict";
+
+    sntls.Hash.addMethods(/** @lends sntls.Hash# */{
+        /**
+         * Reinterprets hash as an evented tree.
+         * @returns {flock.EventedTree}
+         */
+        toEventedTree: function () {
+            return flock.EventedTree.create(this.items);
+        }
+    });
+});
+
 (function () {
     "use strict";
 
@@ -252,16 +266,6 @@ troop.postpone(flock, 'EventedTree', function () {
         isEventedTreeOptional: function (expr) {
             return typeof expr === 'undefined' ||
                    flock.EventedTree.isBaseOf(expr);
-        }
-    });
-
-    sntls.Hash.addMethods(/** @lends sntls.Hash# */{
-        /**
-         * Reinterprets hash as an evented tree.
-         * @returns {flock.EventedTree}
-         */
-        toEventedTree: function () {
-            return flock.EventedTree.create(this.items);
         }
     });
 
