@@ -57,8 +57,8 @@
             triggerSync: function (path) {
                 ok(this.isA(flock.ChangeEvent));
                 equal(path.toString(), 'foo>bar');
-                equal(typeof this.before, 'undefined');
-                deepEqual(this.after, {});
+                equal(typeof this.beforeValue, 'undefined');
+                deepEqual(this.afterValue, {});
                 ok(this.isInsert());
                 ok(!this.isDelete());
             }
@@ -81,8 +81,8 @@
             triggerSync: function (path) {
                 if (path.toString() === 'foo>bar') {
                     ok(this.isA(flock.ChangeEvent));
-                    equal(typeof this.before, 'undefined');
-                    equal(this.after, 'Hello');
+                    equal(typeof this.beforeValue, 'undefined');
+                    equal(this.afterValue, 'Hello');
                     ok(this.isInsert());
                     ok(!this.isDelete());
                 }
@@ -110,8 +110,8 @@
             triggerSync: function (path) {
                 ok(this.isA(flock.ChangeEvent));
                 equal(path.toString(), 'foo>bar');
-                equal(this.before, 'Hello');
-                equal(this.after, 'World');
+                equal(this.beforeValue, 'Hello');
+                equal(this.afterValue, 'World');
                 ok(!this.isInsert());
                 ok(!this.isDelete());
             }
@@ -142,8 +142,8 @@
             broadcastSync: function (path) {
                 ok(this.isA(flock.ChangeEvent));
                 equal(path.toString(), 'foo>bar');
-                equal(this.before, 'Hello');
-                equal(this.after, 'World');
+                equal(this.beforeValue, 'Hello');
+                equal(this.afterValue, 'World');
                 ok(!this.isInsert());
                 ok(!this.isDelete());
             }
@@ -170,8 +170,8 @@
             triggerSync: function (path) {
                 if (path.toString() === 'foo>bar') {
                     ok(this.isA(flock.ChangeEvent));
-                    equal(typeof this.before, 'undefined');
-                    equal(this.after, 'Hello');
+                    equal(typeof this.beforeValue, 'undefined');
+                    equal(this.afterValue, 'Hello');
                     ok(this.isInsert());
                     ok(!this.isDelete());
                 }
@@ -199,8 +199,8 @@
             triggerSync: function (path) {
                 ok(this.isA(flock.ChangeEvent));
                 equal(path.toString(), 'foo>bar');
-                equal(this.before, 'Hello');
-                equal(typeof this.after, 'undefined');
+                equal(this.beforeValue, 'Hello');
+                equal(typeof this.afterValue, 'undefined');
                 ok(!this.isInsert());
                 ok(this.isDelete());
             }
@@ -227,8 +227,8 @@
             triggerSync: function (path) {
                 ok(this.isA(flock.ChangeEvent));
                 equal(path.toString(), 'foo>bar');
-                equal(this.before, 'Hello');
-                equal(typeof this.after, 'undefined');
+                equal(this.beforeValue, 'Hello');
+                equal(typeof this.afterValue, 'undefined');
                 ok(!this.isInsert());
                 ok(this.isDelete());
             }
@@ -262,8 +262,8 @@
             triggerSync: function (path) {
                 ok(this.isA(flock.ChangeEvent));
                 equal(path.toString(), 'foo>bar');
-                notEqual(typeof this.before, 'undefined');
-                equal(typeof this.after, 'undefined');
+                notEqual(typeof this.beforeValue, 'undefined');
+                equal(typeof this.afterValue, 'undefined');
                 ok(!this.isInsert());
                 ok(this.isDelete());
             }

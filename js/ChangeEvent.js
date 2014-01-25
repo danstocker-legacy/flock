@@ -33,13 +33,13 @@ troop.postpone(flock, 'ChangeEvent', function () {
                  * Node value before change.
                  * @type {*}
                  */
-                this.before = undefined;
+                this.beforeValue = undefined;
 
                 /**
                  * Node value after change.
                  * @type {*}
                  */
-                this.after = undefined;
+                this.afterValue = undefined;
             },
 
             /**
@@ -48,7 +48,7 @@ troop.postpone(flock, 'ChangeEvent', function () {
              * @returns {flock.ChangeEvent}
              */
             setBefore: function (value) {
-                this.before = value;
+                this.beforeValue = value;
                 return this;
             },
 
@@ -58,7 +58,7 @@ troop.postpone(flock, 'ChangeEvent', function () {
              * @returns {flock.ChangeEvent}
              */
             setAfter: function (value) {
-                this.after = value;
+                this.afterValue = value;
                 return this;
             },
 
@@ -67,8 +67,8 @@ troop.postpone(flock, 'ChangeEvent', function () {
              * @returns {boolean}
              */
             isInsert: function () {
-                return typeof this.before === 'undefined' &&
-                       typeof this.after !== 'undefined';
+                return typeof this.beforeValue === 'undefined' &&
+                       typeof this.afterValue !== 'undefined';
             },
 
             /**
@@ -76,8 +76,8 @@ troop.postpone(flock, 'ChangeEvent', function () {
              * @returns {boolean}
              */
             isDelete: function () {
-                return typeof this.before !== 'undefined' &&
-                       typeof this.after === 'undefined';
+                return typeof this.beforeValue !== 'undefined' &&
+                       typeof this.afterValue === 'undefined';
             }
         });
 });

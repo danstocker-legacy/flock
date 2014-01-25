@@ -10,11 +10,11 @@
             event = /** @type {flock.ChangeEvent} */ flock.ChangeEvent.create(eventSpace);
 
         equal(event.eventName, flock.ChangeEvent.EVENT_NAME_CHANGE, "Event name");
-        equal(typeof event.before, 'undefined', "Before value is not defined");
-        equal(typeof event.after, 'undefined', "After value is not defined");
+        equal(typeof event.beforeValue, 'undefined', "Before value is not defined");
+        equal(typeof event.afterValue, 'undefined', "After value is not defined");
     });
 
-    test("Setting before value", function () {
+    test("Setting beforeValue value", function () {
         var eventSpace = evan.EventSpace.create(),
             event = flock.ChangeEvent.create(eventSpace),
             result;
@@ -22,7 +22,7 @@
         result = event.setBefore('foo');
 
         strictEqual(result, event, "Is chainable");
-        equal(event.before, 'foo');
+        equal(event.beforeValue, 'foo');
     });
 
     test("Setting after value", function () {
@@ -33,7 +33,7 @@
         result = event.setAfter('bar');
 
         strictEqual(result, event, "Is chainable");
-        equal(event.after, 'bar');
+        equal(event.afterValue, 'bar');
     });
 
     test("Flags", function () {
@@ -67,8 +67,8 @@
         evan.Event.addMocks({
             triggerSync: function (path, data) {
                 equal(path.toString(), 'foo>bar');
-                equal(this.before, 'hello');
-                equal(this.after, 'world');
+                equal(this.beforeValue, 'hello');
+                equal(this.afterValue, 'world');
                 strictEqual(data, customData);
             }
         });
@@ -90,8 +90,8 @@
         evan.Event.addMocks({
             broadcastSync: function (path, data) {
                 equal(path.toString(), 'foo>bar');
-                equal(this.before, 'hello');
-                equal(this.after, 'world');
+                equal(this.beforeValue, 'hello');
+                equal(this.afterValue, 'world');
                 strictEqual(data, customData);
             }
         });
