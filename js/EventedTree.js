@@ -90,6 +90,28 @@ troop.postpone(flock, 'EventedTree', function () {
             },
 
             /**
+             * Changes node and broadcasts instead of just triggering event.
+             * Use this when listeners are expected to be subscribed below the changed path.
+             * @param {sntls.Path} path
+             * @param {*} value
+             * @returns {flock.EventedTree}
+             */
+            setNodeWithBroadcast: function (path, value) {
+                var beforeNode = base.getNode.call(this, path);
+
+                base.setNode.call(this, path, value);
+
+                if (value !== beforeNode) {
+                    flock.ChangeEvent.create(this.eventSpace)
+                        .setBefore(beforeNode)
+                        .setAfter(value)
+                        .broadcastSync(path);
+                }
+
+                return this;
+            },
+
+            /**
              * Might set node
              * @param {sntls.Path} path Path to node
              * @param {function} generator Generator function returning value

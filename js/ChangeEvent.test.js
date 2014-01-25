@@ -81,4 +81,32 @@
 
         evan.Event.removeMocks();
     });
+
+    test("Broadcasting", function () {
+        expect(3);
+
+        var eventSpace = evan.EventSpace.create(),
+            event = flock.ChangeEvent.create(eventSpace)
+                .setBefore('hello')
+                .setAfter('world'),
+            result;
+
+        evan.Event.addMocks({
+            broadcastSync: function (path, data) {
+                equal(path.toString(), 'foo>bar');
+                deepEqual(data, {
+                    before  : 'hello',
+                    after   : 'world',
+                    isInsert: false,
+                    isDelete: false
+                });
+            }
+        });
+
+        result = event.broadcastSync('foo>bar'.toPath());
+
+        strictEqual(result, event, "Is chainable");
+
+        evan.Event.removeMocks();
+    });
 }());

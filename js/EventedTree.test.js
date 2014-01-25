@@ -128,6 +128,38 @@
         evan.Event.removeMocks();
     });
 
+    test("Change node w/ broadcast", function () {
+        expect(7);
+
+        var tree = flock.EventedTree.create({
+                foo: {
+                    bar: "Hello"
+                }
+            }),
+            result;
+
+        evan.Event.addMocks({
+            broadcastSync: function (path, data) {
+                ok(this.isA(flock.ChangeEvent));
+                equal(path.toString(), 'foo>bar');
+                equal(data.before, 'Hello');
+                equal(data.after, 'World');
+                ok(!data.isInsert);
+                ok(!data.isDelete);
+            }
+        });
+
+        // will not fire
+        result = tree.setNodeWithBroadcast('foo>bar'.toPath(), 'Hello');
+
+        strictEqual(result, tree, "Is chainable");
+
+        // will fire
+        tree.setNodeWithBroadcast('foo>bar'.toPath(), 'World');
+
+        evan.Event.removeMocks();
+    });
+
     test("Get or set node", function () {
         expect(6);
 

@@ -98,6 +98,15 @@ troop.postpone(flock, 'ChangeEvent', function () {
             triggerSync: function (targetPath) {
                 base.triggerSync.call(this, targetPath, this.data);
                 return this;
+            },
+
+            /**
+             * @param {sntls.Path} targetPath Path on which to broadcast event.
+             * @return {flock.ChangeEvent}
+             */
+            broadcastSync: function (targetPath) {
+                base.broadcastSync.call(this, targetPath, this.data);
+                return this;
             }
         });
 });
