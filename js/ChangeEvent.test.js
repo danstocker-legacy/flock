@@ -10,7 +10,8 @@
             event = /** @type {flock.ChangeEvent} */ flock.ChangeEvent.create(eventSpace);
 
         equal(event.eventName, flock.ChangeEvent.EVENT_NAME_CHANGE, "Event name");
-        ok(event.data instanceof Object, "Data load is object");
+        equal(typeof event.before, 'undefined', "Before value is not defined");
+        equal(typeof event.after, 'undefined', "After value is not defined");
     });
 
     test("Setting before value", function () {
@@ -21,7 +22,7 @@
         result = event.setBefore('foo');
 
         strictEqual(result, event, "Is chainable");
-        equal(event.data.before, 'foo');
+        equal(event.before, 'foo');
     });
 
     test("Setting after value", function () {
@@ -32,7 +33,7 @@
         result = event.setAfter('bar');
 
         strictEqual(result, event, "Is chainable");
-        equal(event.data.after, 'bar');
+        equal(event.after, 'bar');
     });
 
     test("Flags", function () {
@@ -46,7 +47,7 @@
         event = flock.ChangeEvent.create(eventSpace)
             .setBefore('foo');
         ok(!event.isInsert(), "Deletion not insert");
-        ok(event.isDelete, "Deletion");
+        ok(event.isDelete(), "Deletion");
 
         event = flock.ChangeEvent.create(eventSpace)
             .setAfter('bar');
@@ -55,57 +56,47 @@
     });
 
     test("Triggering", function () {
-        expect(3);
+        expect(4);
 
         var eventSpace = evan.EventSpace.create(),
             event = flock.ChangeEvent.create(eventSpace)
                 .setBefore('hello')
                 .setAfter('world'),
-            result;
+            customData = {};
 
         evan.Event.addMocks({
             triggerSync: function (path, data) {
                 equal(path.toString(), 'foo>bar');
-                deepEqual(data, {
-                    before  : 'hello',
-                    after   : 'world',
-                    isInsert: false,
-                    isDelete: false
-                });
+                equal(this.before, 'hello');
+                equal(this.after, 'world');
+                strictEqual(data, customData);
             }
         });
 
-        result = event.triggerSync('foo>bar'.toPath());
-
-        strictEqual(result, event, "Is chainable");
+        event.triggerSync('foo>bar'.toPath(), customData);
 
         evan.Event.removeMocks();
     });
 
     test("Broadcasting", function () {
-        expect(3);
+        expect(4);
 
         var eventSpace = evan.EventSpace.create(),
             event = flock.ChangeEvent.create(eventSpace)
                 .setBefore('hello')
                 .setAfter('world'),
-            result;
+            customData = {};
 
         evan.Event.addMocks({
             broadcastSync: function (path, data) {
                 equal(path.toString(), 'foo>bar');
-                deepEqual(data, {
-                    before  : 'hello',
-                    after   : 'world',
-                    isInsert: false,
-                    isDelete: false
-                });
+                equal(this.before, 'hello');
+                equal(this.after, 'world');
+                strictEqual(data, customData);
             }
         });
 
-        result = event.broadcastSync('foo>bar'.toPath());
-
-        strictEqual(result, event, "Is chainable");
+        event.broadcastSync('foo>bar'.toPath(), customData);
 
         evan.Event.removeMocks();
     });

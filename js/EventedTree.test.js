@@ -54,13 +54,13 @@
             result;
 
         evan.Event.addMocks({
-            triggerSync: function (path, data) {
+            triggerSync: function (path) {
                 ok(this.isA(flock.ChangeEvent));
                 equal(path.toString(), 'foo>bar');
-                equal(typeof data.before, 'undefined');
-                deepEqual(data.after, {});
-                ok(data.isInsert);
-                ok(!data.isDelete);
+                equal(typeof this.before, 'undefined');
+                deepEqual(this.after, {});
+                ok(this.isInsert());
+                ok(!this.isDelete());
             }
         });
 
@@ -78,13 +78,13 @@
             result;
 
         evan.Event.addMocks({
-            triggerSync: function (path, data) {
+            triggerSync: function (path) {
                 if (path.toString() === 'foo>bar') {
                     ok(this.isA(flock.ChangeEvent));
-                    equal(typeof data.before, 'undefined');
-                    equal(data.after, 'Hello');
-                    ok(data.isInsert);
-                    ok(!data.isDelete);
+                    equal(typeof this.before, 'undefined');
+                    equal(this.after, 'Hello');
+                    ok(this.isInsert());
+                    ok(!this.isDelete());
                 }
             }
         });
@@ -107,13 +107,13 @@
             result;
 
         evan.Event.addMocks({
-            triggerSync: function (path, data) {
+            triggerSync: function (path) {
                 ok(this.isA(flock.ChangeEvent));
                 equal(path.toString(), 'foo>bar');
-                equal(data.before, 'Hello');
-                equal(data.after, 'World');
-                ok(!data.isInsert);
-                ok(!data.isDelete);
+                equal(this.before, 'Hello');
+                equal(this.after, 'World');
+                ok(!this.isInsert());
+                ok(!this.isDelete());
             }
         });
 
@@ -139,13 +139,13 @@
             result;
 
         evan.Event.addMocks({
-            broadcastSync: function (path, data) {
+            broadcastSync: function (path) {
                 ok(this.isA(flock.ChangeEvent));
                 equal(path.toString(), 'foo>bar');
-                equal(data.before, 'Hello');
-                equal(data.after, 'World');
-                ok(!data.isInsert);
-                ok(!data.isDelete);
+                equal(this.before, 'Hello');
+                equal(this.after, 'World');
+                ok(!this.isInsert());
+                ok(!this.isDelete());
             }
         });
 
@@ -167,13 +167,13 @@
             result;
 
         evan.Event.addMocks({
-            triggerSync: function (path, data) {
+            triggerSync: function (path) {
                 if (path.toString() === 'foo>bar') {
                     ok(this.isA(flock.ChangeEvent));
-                    equal(typeof data.before, 'undefined');
-                    equal(data.after, 'Hello');
-                    ok(data.isInsert);
-                    ok(!data.isDelete);
+                    equal(typeof this.before, 'undefined');
+                    equal(this.after, 'Hello');
+                    ok(this.isInsert());
+                    ok(!this.isDelete());
                 }
             }
         });
@@ -196,13 +196,13 @@
             result;
 
         evan.Event.addMocks({
-            triggerSync: function (path, data) {
+            triggerSync: function (path) {
                 ok(this.isA(flock.ChangeEvent));
                 equal(path.toString(), 'foo>bar');
-                equal(data.before, 'Hello');
-                equal(typeof data.after, 'undefined');
-                ok(!data.isInsert);
-                ok(data.isDelete);
+                equal(this.before, 'Hello');
+                equal(typeof this.after, 'undefined');
+                ok(!this.isInsert());
+                ok(this.isDelete());
             }
         });
 
@@ -224,13 +224,13 @@
             result;
 
         evan.Event.addMocks({
-            triggerSync: function (path, data) {
+            triggerSync: function (path) {
                 ok(this.isA(flock.ChangeEvent));
                 equal(path.toString(), 'foo>bar');
-                equal(data.before, 'Hello');
-                equal(typeof data.after, 'undefined');
-                ok(!data.isInsert);
-                ok(data.isDelete);
+                equal(this.before, 'Hello');
+                equal(typeof this.after, 'undefined');
+                ok(!this.isInsert());
+                ok(this.isDelete());
             }
         });
 
@@ -259,13 +259,13 @@
             result;
 
         evan.Event.addMocks({
-            triggerSync: function (path, data) {
+            triggerSync: function (path) {
                 ok(this.isA(flock.ChangeEvent));
                 equal(path.toString(), 'foo>bar');
-                notEqual(typeof data.before, 'undefined');
-                equal(typeof data.after, 'undefined');
-                ok(!data.isInsert);
-                ok(data.isDelete);
+                notEqual(typeof this.before, 'undefined');
+                equal(typeof this.after, 'undefined');
+                ok(!this.isInsert());
+                ok(this.isDelete());
             }
         });
 

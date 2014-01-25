@@ -21,16 +21,6 @@ troop.postpone(flock, 'ChangeEvent', function () {
         .addConstants(/** @lends flock.ChangeEvent */{
             EVENT_NAME_CHANGE: 'eventChange'
         })
-        .addPrivateMethods(/** @lends flock.ChangeEvent# */{
-            /**
-             * Updates flags to reflect the current before-after values.
-             * @private
-             */
-            _updateFlags: function () {
-                this.data.isInsert = this.isInsert();
-                this.data.isDelete = this.isDelete();
-            }
-        })
         .addMethods(/** @lends flock.ChangeEvent# */{
             /**
              * @param {evan.EventSpace} eventSpace Event space associated with event
@@ -39,14 +29,17 @@ troop.postpone(flock, 'ChangeEvent', function () {
             init: function (eventSpace) {
                 base.init.call(this, eventSpace, this.EVENT_NAME_CHANGE);
 
-                this.data = {
-                    before  : undefined,
-                    after   : undefined,
-                    isInsert: undefined,
-                    isDelete: undefined
-                };
+                /**
+                 * Node value before change.
+                 * @type {*}
+                 */
+                this.before = undefined;
 
-                this.setData(this.data);
+                /**
+                 * Node value after change.
+                 * @type {*}
+                 */
+                this.after = undefined;
             },
 
             /**
@@ -55,8 +48,7 @@ troop.postpone(flock, 'ChangeEvent', function () {
              * @returns {flock.ChangeEvent}
              */
             setBefore: function (value) {
-                this.data.before = value;
-                this._updateFlags();
+                this.before = value;
                 return this;
             },
 
@@ -66,8 +58,7 @@ troop.postpone(flock, 'ChangeEvent', function () {
              * @returns {flock.ChangeEvent}
              */
             setAfter: function (value) {
-                this.data.after = value;
-                this._updateFlags();
+                this.after = value;
                 return this;
             },
 
@@ -76,9 +67,8 @@ troop.postpone(flock, 'ChangeEvent', function () {
              * @returns {boolean}
              */
             isInsert: function () {
-                var data = this.data;
-                return typeof data.before === 'undefined' &&
-                       typeof data.after !== 'undefined';
+                return typeof this.before === 'undefined' &&
+                       typeof this.after !== 'undefined';
             },
 
             /**
@@ -86,27 +76,8 @@ troop.postpone(flock, 'ChangeEvent', function () {
              * @returns {boolean}
              */
             isDelete: function () {
-                var data = this.data;
-                return typeof data.before !== 'undefined' &&
-                       typeof data.after === 'undefined';
-            },
-
-            /**
-             * @param {sntls.Path} targetPath Path on which to trigger event.
-             * @return {flock.ChangeEvent}
-             */
-            triggerSync: function (targetPath) {
-                base.triggerSync.call(this, targetPath, this.data);
-                return this;
-            },
-
-            /**
-             * @param {sntls.Path} targetPath Path on which to broadcast event.
-             * @return {flock.ChangeEvent}
-             */
-            broadcastSync: function (targetPath) {
-                base.broadcastSync.call(this, targetPath, this.data);
-                return this;
+                return typeof this.before !== 'undefined' &&
+                       typeof this.after === 'undefined';
             }
         });
 });
