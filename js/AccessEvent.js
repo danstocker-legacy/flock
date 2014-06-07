@@ -25,7 +25,7 @@ troop.postpone(flock, 'AccessEvent', function () {
              * @ignore
              */
             init: function (eventSpace) {
-                base.init.call(this, eventSpace, this.EVENT_NAME_ACCESS);
+                base.init.call(this, this.EVENT_NAME_ACCESS, eventSpace);
             }
         });
 });

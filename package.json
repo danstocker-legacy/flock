@@ -1,6 +1,6 @@
 {
     "name"           : "flock",
-    "version"        : "0.2.0",
+    "version"        : "0.2.1",
     "description"    : "Evented key-value cache",
     "keywords"       : ["tree", "xpath", "nosql"],
     "author"         : "Dan Stocker <dan@kwaia.com>",
@@ -13,8 +13,8 @@
     "dependencies"   : {
         "dessert": "~0.3.2",
         "troop"  : "~0.7.2",
-        "sntls"  : "~0.16.1",
-        "evan"   : "~0.2.5"
+        "sntls"  : "~0.17.0",
+        "evan"   : "~0.3.0"
     },
     "devDependencies": {
         "phil"                : "~0.2.3",

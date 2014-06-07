@@ -27,7 +27,7 @@ troop.postpone(flock, 'ChangeEvent', function () {
              * @ignore
              */
             init: function (eventSpace) {
-                base.init.call(this, eventSpace, this.EVENT_NAME_CHANGE);
+                base.init.call(this, this.EVENT_NAME_CHANGE, eventSpace);
 
                 /**
                  * Node value before change.
