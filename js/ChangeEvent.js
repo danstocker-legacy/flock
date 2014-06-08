@@ -2,7 +2,7 @@
 troop.postpone(flock, 'ChangeEvent', function () {
     "use strict";
 
-    var base = evan.Event,
+    var base = flock.CacheEvent,
         self = base.extend();
 
     /**
@@ -17,7 +17,7 @@ troop.postpone(flock, 'ChangeEvent', function () {
     /**
      * Describes a change event occurring in a flock EventedTree.
      * @class
-     * @extends evan.Event
+     * @extends flock.CacheEvent
      */
     flock.ChangeEvent = self
         .addConstants(/** @lends flock.ChangeEvent */{

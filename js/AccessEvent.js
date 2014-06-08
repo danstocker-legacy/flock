@@ -2,7 +2,7 @@
 troop.postpone(flock, 'AccessEvent', function () {
     "use strict";
 
-    var base = evan.Event,
+    var base = flock.CacheEvent,
         self = base.extend();
 
     /**
@@ -15,7 +15,7 @@ troop.postpone(flock, 'AccessEvent', function () {
 
     /**
      * @class
-     * @extends evan.Event
+     * @extends flock.CacheEvent
      */
     flock.AccessEvent = self
         .addConstants(/** @lends flock.AccessEvent */{

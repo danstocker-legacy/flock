@@ -7,6 +7,7 @@ module.exports = function (grunt) {
             'js/namespace.js',
             'js/CacheEventSpace.js',
             'js/CacheEvent.js',
+            'js/ChangeEvent.js',
             'js/AccessEvent.js',
             'js/EventedTree.js'
         ],
