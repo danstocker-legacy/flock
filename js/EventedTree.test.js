@@ -8,293 +8,370 @@
     test("Instantiation", function () {
         var tree = flock.EventedTree.create();
 
-        ok(tree.eventSpace.isA(evan.EventSpace), "Is event space");
+        ok(tree.eventSpace.isA(flock.CacheEventSpace), "should set event space");
     });
 
-    test("Type conversion", function () {
+    test("Conversion from Hash", function () {
         var hash = sntls.Hash.create(),
             tree = hash.toEventedTree();
 
-        ok(tree.isA(flock.EventedTree), "Is evented tree");
+        ok(tree.isA(flock.EventedTree), "should return EventedTree instance");
     });
 
-    test("Array conversion", function () {
+    test("Conversion from Array", function () {
         var buffer = [1, 2, 3, 4, 5],
             tree = buffer.toEventedTree();
 
-        ok(tree.isA(flock.EventedTree), "Is evented tree");
-        strictEqual(tree.items, buffer, "Tree buffer");
+        ok(tree.isA(flock.EventedTree), "should return EventedTree instance");
+        strictEqual(tree.items, buffer, "should set array as Tree buffer");
     });
 
-    test("Get node", function () {
-        expect(3);
+    test("Getting node", function () {
+        expect(4);
 
         var tree = flock.EventedTree.create(),
-            result;
+            path = 'foo>bar'.toPath();
+
+        sntls.Tree.addMocks({
+            getNode: function (targetPath) {
+                strictEqual(this, tree, "should call base' getNode");
+                strictEqual(targetPath, path, "should get target node");
+                return undefined;
+            }
+        });
 
         evan.Event.addMocks({
-            triggerSync: function (path) {
-                ok(this.isA(flock.AccessEvent));
-                equal(path.toString(), 'foo>bar');
+            triggerSync: function (eventPath) {
+                strictEqual(eventPath, path, "should trigger access event on specified path");
+                return this;
             }
         });
 
         // path does not exist in empty tree, access event will fire
-        result = tree.getNode('foo>bar'.toPath());
+        equal(typeof tree.getNode(path), 'undefined', "should fetch node");
 
-        equal(typeof result, 'undefined', "Node fetched");
-
+        sntls.Tree.removeMocks();
         evan.Event.removeMocks();
     });
 
-    test("Get safe node", function () {
+    // TODO: Add case where Tree.getSafeNode() returns value other than undefined.
+    test("Getting safe node", function () {
         expect(7);
 
         var tree = flock.EventedTree.create(),
-            result;
+            path = 'foo>bar'.toPath(),
+            newNode = {};
 
-        evan.Event.addMocks({
-            triggerSync: function (path) {
-                ok(this.isA(flock.ChangeEvent));
-                equal(path.toString(), 'foo>bar');
-                equal(typeof this.beforeValue, 'undefined');
-                deepEqual(this.afterValue, {});
-                ok(this.isInsert());
-                ok(!this.isDelete());
+        function handler(targetPath, afterNode) {
+            strictEqual(targetPath, path, "should call handler with specified path");
+            strictEqual(afterNode, newNode, "should pass new node to handler");
+        }
+
+        sntls.Tree.addMocks({
+            getSafeNode: function (targetPath, handler) {
+                strictEqual(targetPath, path, "should fetch safe node from specified path");
+                handler(path, newNode);
+                return undefined;
             }
         });
 
-        result = tree.getSafeNode('foo>bar'.toPath());
+        flock.ChangeEvent.addMocks({
+            triggerSync: function (eventPath) {
+                strictEqual(eventPath, path, "should trigger change event on specified path");
+                equal(typeof this.beforeValue, 'undefined', "should set before value to undefined");
+                strictEqual(this.afterValue, newNode, "should set after value to created node");
+            }
+        });
 
-        deepEqual(result, {}, "Node fetched");
+        equal(typeof tree.getSafeNode(path, handler), 'undefined', "should fetch undefined");
 
-        evan.Event.removeMocks();
+        sntls.Tree.removeMocks();
+        flock.ChangeEvent.removeMocks();
     });
 
-    test("Insert node", function () {
-        expect(6);
+    test("Node insertion", function () {
+        expect(9);
 
         var tree = flock.EventedTree.create(),
-            result;
+            path = 'foo>bar'.toPath(),
+            afterNode = {};
 
-        evan.Event.addMocks({
-            triggerSync: function (path) {
-                if (path.toString() === 'foo>bar') {
-                    ok(this.isA(flock.ChangeEvent));
-                    equal(typeof this.beforeValue, 'undefined');
-                    equal(this.afterValue, 'Hello');
-                    ok(this.isInsert());
-                    ok(!this.isDelete());
-                }
+        sntls.Tree.addMocks({
+            getNode: function (targetPath) {
+                strictEqual(this, tree, "should fetch node from current tree");
+                strictEqual(targetPath, path, "should pass specified path to getter");
+                return undefined; // specified path is empty
+            },
+
+            setNode: function (targetPath, node) {
+                strictEqual(this, tree, "should set node on current tree");
+                strictEqual(targetPath, path, "should pass specified path to setter");
+                strictEqual(node, afterNode, "should pass specified node to setter");
+                return this;
             }
         });
 
-        result = tree.setNode('foo>bar'.toPath(), 'Hello');
-
-        strictEqual(result, tree, "Is chainable");
-
-        evan.Event.removeMocks();
-    });
-
-    test("Change node", function () {
-        expect(7);
-
-        var tree = flock.EventedTree.create({
-                foo: {
-                    bar: "Hello"
-                }
-            }),
-            result;
-
-        evan.Event.addMocks({
-            triggerSync: function (path) {
-                ok(this.isA(flock.ChangeEvent));
-                equal(path.toString(), 'foo>bar');
-                equal(this.beforeValue, 'Hello');
-                equal(this.afterValue, 'World');
-                ok(!this.isInsert());
-                ok(!this.isDelete());
+        flock.ChangeEvent.addMocks({
+            triggerSync: function (eventPath) {
+                strictEqual(eventPath, path, "should trigger change event on specified path");
+                equal(typeof this.beforeValue, 'undefined', "should set before value to undefined");
+                strictEqual(this.afterValue, afterNode, "should set after value to specified node");
             }
         });
 
-        // will not fire
-        result = tree.setNode('foo>bar'.toPath(), 'Hello');
+        strictEqual(tree.setNode(path, afterNode), tree, "should be chainable");
 
-        strictEqual(result, tree, "Is chainable");
-
-        // will fire
-        tree.setNode('foo>bar'.toPath(), 'World');
-
-        evan.Event.removeMocks();
+        sntls.Tree.removeMocks();
+        flock.ChangeEvent.removeMocks();
     });
 
-    test("Change node w/ broadcast", function () {
-        expect(7);
-
-        var tree = flock.EventedTree.create({
-                foo: {
-                    bar: "Hello"
-                }
-            }),
-            result;
-
-        evan.Event.addMocks({
-            broadcastSync: function (path) {
-                ok(this.isA(flock.ChangeEvent));
-                equal(path.toString(), 'foo>bar');
-                equal(this.beforeValue, 'Hello');
-                equal(this.afterValue, 'World');
-                ok(!this.isInsert());
-                ok(!this.isDelete());
-            }
-        });
-
-        // will not fire
-        result = tree.setNodeWithBroadcast('foo>bar'.toPath(), 'Hello');
-
-        strictEqual(result, tree, "Is chainable");
-
-        // will fire
-        tree.setNodeWithBroadcast('foo>bar'.toPath(), 'World');
-
-        evan.Event.removeMocks();
-    });
-
-    test("Get or set node", function () {
-        expect(6);
+    // TODO: Add case where afterNode === beforeNode.
+    test("Setting node", function () {
+        expect(9);
 
         var tree = flock.EventedTree.create(),
-            result;
+            path = 'foo>bar'.toPath(),
+            beforeNode = {},
+            afterNode = {};
 
-        evan.Event.addMocks({
-            triggerSync: function (path) {
-                if (path.toString() === 'foo>bar') {
-                    ok(this.isA(flock.ChangeEvent));
-                    equal(typeof this.beforeValue, 'undefined');
-                    equal(this.afterValue, 'Hello');
-                    ok(this.isInsert());
-                    ok(!this.isDelete());
-                }
+        sntls.Tree.addMocks({
+            getNode: function (targetPath) {
+                strictEqual(this, tree, "should fetch node from current tree");
+                strictEqual(targetPath, path, "should pass specified path to getter");
+                return beforeNode;
+            },
+
+            setNode: function (targetPath, node) {
+                strictEqual(this, tree, "should set node on current tree");
+                strictEqual(targetPath, path, "should pass specified path to setter");
+                strictEqual(node, afterNode, "should pass specified node to setter");
+                return this;
             }
         });
 
-        result = tree.getOrSetNode('foo>bar'.toPath(), function () {return 'Hello';});
-
-        equal(result, "Hello");
-
-        evan.Event.removeMocks();
-    });
-
-    test("Unset node", function () {
-        expect(7);
-
-        var tree = flock.EventedTree.create({
-                foo: {
-                    bar: "Hello"
-                }
-            }),
-            result;
-
-        evan.Event.addMocks({
-            triggerSync: function (path) {
-                ok(this.isA(flock.ChangeEvent));
-                equal(path.toString(), 'foo>bar');
-                equal(this.beforeValue, 'Hello');
-                equal(typeof this.afterValue, 'undefined');
-                ok(!this.isInsert());
-                ok(this.isDelete());
+        flock.ChangeEvent.addMocks({
+            triggerSync: function (eventPath) {
+                strictEqual(eventPath, path, "should trigger change event on specified path");
+                strictEqual(this.beforeValue, beforeNode, "should set before value to previous node");
+                strictEqual(this.afterValue, afterNode, "should set after value to specified node");
             }
         });
 
-        result = tree.unsetNode('foo>bar'.toPath());
+        strictEqual(tree.setNode(path, afterNode), tree, "should be chainable");
 
-        strictEqual(result, tree, "Is chainable");
-
-        evan.Event.removeMocks();
+        sntls.Tree.removeMocks();
+        flock.ChangeEvent.removeMocks();
     });
 
-    test("Unset key", function () {
-        expect(7);
+    // TODO: Add case where afterNode === beforeNode.
+    test("Setting node with broadcast", function () {
+        expect(9);
 
-        var tree = flock.EventedTree.create({
-                foo: {
-                    bar: "Hello"
-                }
-            }),
-            result;
+        var tree = flock.EventedTree.create(),
+            path = 'foo>bar'.toPath(),
+            beforeNode = {},
+            afterNode = {};
 
-        evan.Event.addMocks({
-            triggerSync: function (path) {
-                ok(this.isA(flock.ChangeEvent));
-                equal(path.toString(), 'foo>bar');
-                equal(this.beforeValue, 'Hello');
-                equal(typeof this.afterValue, 'undefined');
-                ok(!this.isInsert());
-                ok(this.isDelete());
+        sntls.Tree.addMocks({
+            getNode: function (targetPath) {
+                strictEqual(this, tree, "should fetch node from current tree");
+                strictEqual(targetPath, path, "should pass specified path to getter");
+                return beforeNode;
+            },
+
+            setNode: function (targetPath, node) {
+                strictEqual(this, tree, "should set node on current tree");
+                strictEqual(targetPath, path, "should pass specified path to setter");
+                strictEqual(node, afterNode, "should pass specified node to setter");
+                return this;
             }
         });
 
-        result = tree.unsetKey('foo>bar'.toPath());
-
-        strictEqual(result, tree, "Is chainable");
-
-        evan.Event.removeMocks();
-    });
-
-    // TODO: Add test case for .unsetKey w/ splice
-
-    test("Unset path", function () {
-        expect(7);
-
-        var tree = flock.EventedTree.create({
-                foo: {
-                    bar: {
-                        baz: "Hello"
-                    },
-                    baz: {
-                        bar: "World"
-                    }
-                }
-            }),
-            result;
-
-        evan.Event.addMocks({
-            triggerSync: function (path) {
-                ok(this.isA(flock.ChangeEvent));
-                equal(path.toString(), 'foo>bar');
-                notEqual(typeof this.beforeValue, 'undefined');
-                equal(typeof this.afterValue, 'undefined');
-                ok(!this.isInsert());
-                ok(this.isDelete());
+        flock.ChangeEvent.addMocks({
+            broadcastSync: function (eventPath) {
+                strictEqual(eventPath, path, "should trigger change event on specified path");
+                strictEqual(this.beforeValue, beforeNode, "should set before value to previous node");
+                strictEqual(this.afterValue, afterNode, "should set after value to specified node");
             }
         });
 
-        result = tree.unsetPath('foo>bar>baz'.toPath());
+        strictEqual(tree.setNodeWithBroadcast(path, afterNode), tree, "should be chainable");
 
-        strictEqual(result, tree, "Is chainable");
-
-        evan.Event.removeMocks();
+        sntls.Tree.removeMocks();
+        flock.ChangeEvent.removeMocks();
     });
 
-    // TODO: Add test case for .unsetPath w/ splice
+    test("Getting or setting node", function () {
+        expect(8);
+
+        var tree = flock.EventedTree.create(),
+            path = 'foo>bar'.toPath(),
+            newNode = {};
+
+        function nodeGenerator() {
+            return newNode;
+        }
+
+        function handler(targetPath, afterNode) {
+            strictEqual(targetPath, path, "should call handler with specified path");
+            strictEqual(afterNode, newNode, "should pass new node to handler");
+        }
+
+        sntls.Tree.addMocks({
+            getOrSetNode: function (targetPath, generator, handler) {
+                strictEqual(targetPath, path, "should call super with specified path");
+                strictEqual(generator, nodeGenerator, "should pass generator function to super");
+                handler(path, generator());
+                return generator();
+            }
+        });
+
+        flock.ChangeEvent.addMocks({
+            triggerSync: function (eventPath) {
+                strictEqual(eventPath, path, "should trigger change event on specified path");
+                equal(typeof this.beforeValue, 'undefined', "should set before value to undefined");
+                strictEqual(this.afterValue, newNode, "should set after value to created node");
+            }
+        });
+
+        strictEqual(tree.getOrSetNode(path, nodeGenerator, handler), newNode, "should return generated node");
+
+        sntls.Tree.removeMocks();
+        flock.ChangeEvent.removeMocks();
+    });
+
+    // TODO: Add case where afterNode === beforeNode.
+    test("Node removal", function () {
+        expect(8);
+
+        var tree = flock.EventedTree.create(),
+            path = 'foo>bar'.toPath(),
+            beforeNode = {};
+
+        sntls.Tree.addMocks({
+            getNode: function (targetPath) {
+                strictEqual(this, tree, "should fetch node from current tree");
+                strictEqual(targetPath, path, "should pass specified path to getter");
+                return beforeNode;
+            },
+
+            unsetNode: function (targetPath) {
+                strictEqual(this, tree, "should call super");
+                strictEqual(targetPath, path, "should pass specified path to super");
+                return this;
+            }
+        });
+
+        flock.ChangeEvent.addMocks({
+            triggerSync: function (eventPath) {
+                strictEqual(eventPath, path, "should trigger change event on specified path");
+                strictEqual(this.beforeValue, beforeNode, "should set before value to previous node");
+                equal(typeof this.afterValue, 'undefined', "should set after value to undefined");
+            }
+        });
+
+        strictEqual(tree.unsetNode(path), tree, "should be chainable");
+
+        sntls.Tree.removeMocks();
+        flock.ChangeEvent.removeMocks();
+    });
+
+    // TODO: Add case where splice === true.
+    test("Key removal", function () {
+        expect(9);
+
+        var tree = flock.EventedTree.create(),
+            path = 'foo>bar'.toPath(),
+            beforeNode = {};
+
+        function handler(targetPath) {
+            strictEqual(targetPath, path, "should call handler with specified path");
+        }
+
+        sntls.Tree.addMocks({
+            getNode: function (targetPath) {
+                strictEqual(this, tree, "should fetch node from current tree");
+                strictEqual(targetPath, path, "should pass specified path to getter");
+                return beforeNode;
+            },
+
+            unsetKey: function (targetPath, splice, handler) {
+                strictEqual(this, tree, "should call super");
+                strictEqual(targetPath, path, "should pass specified path to super");
+                handler(targetPath, undefined);
+                return this;
+            }
+        });
+
+        flock.ChangeEvent.addMocks({
+            triggerSync: function (eventPath) {
+                strictEqual(eventPath, path, "should trigger change event on specified path");
+                strictEqual(this.beforeValue, beforeNode, "should set before value to previous node");
+                equal(typeof this.afterValue, 'undefined', "should set after value to undefined");
+            }
+        });
+
+        strictEqual(tree.unsetKey(path, false, handler), tree, "should be chainable");
+
+        sntls.Tree.removeMocks();
+        flock.ChangeEvent.removeMocks();
+    });
+
+    // TODO: Add case where splice === true.
+    test("Path removal", function () {
+        expect(9);
+
+        var tree = flock.EventedTree.create(),
+            path = 'foo>bar'.toPath(),
+            beforeNode = {};
+
+        function handler(targetPath) {
+            strictEqual(targetPath, path, "should call handler with specified path");
+        }
+
+        sntls.Tree.addMocks({
+            getNode: function (targetPath) {
+                strictEqual(this, tree, "should fetch node from current tree");
+                strictEqual(targetPath, path, "should pass specified path to getter");
+                return beforeNode;
+            },
+
+            unsetPath: function (targetPath, splice, handler) {
+                strictEqual(this, tree, "should call super");
+                strictEqual(targetPath, path, "should pass specified path to super");
+                handler(targetPath, undefined);
+                return this;
+            }
+        });
+
+        flock.ChangeEvent.addMocks({
+            triggerSync: function (eventPath) {
+                strictEqual(eventPath, path, "should trigger change event on specified path");
+                strictEqual(this.beforeValue, beforeNode, "should set before value to previous node");
+                equal(typeof this.afterValue, 'undefined', "should set after value to undefined");
+            }
+        });
+
+        strictEqual(tree.unsetPath(path, false, handler), tree, "should be chainable");
+
+        sntls.Tree.removeMocks();
+        flock.ChangeEvent.removeMocks();
+    });
 
     test("Subscription proxy", function () {
         expect(4);
 
-        var tree = flock.EventedTree.create(),
-            result;
+        var tree = flock.EventedTree.create();
 
         evan.EventSpace.addMocks({
             subscribeTo: function (eventName, eventPath, handler) {
-                equal(eventName, 'eventName');
-                equal(eventPath, 'eventPath');
-                equal(handler, 'handler');
+                equal(eventName, 'eventName', "should pass event name to super");
+                equal(eventPath, 'eventPath', "should pass event path to super");
+                equal(handler, 'handler', "should pass handler to super");
             }
         });
 
-        result = tree.subscribeTo('eventName', 'eventPath', 'handler');
-
-        strictEqual(result, tree, "Is chainable");
+        strictEqual(tree.subscribeTo('eventName', 'eventPath', 'handler'), tree, "should be chainable");
 
         evan.EventSpace.removeMocks();
     });
@@ -302,43 +379,39 @@
     test("Unsubscription proxy", function () {
         expect(4);
 
-        var tree = flock.EventedTree.create(),
-            result;
+        var tree = flock.EventedTree.create();
 
         evan.EventSpace.addMocks({
             unsubscribeFrom: function (eventName, eventPath, handler) {
-                equal(eventName, 'eventName');
-                equal(eventPath, 'eventPath');
-                equal(handler, 'handler');
+                equal(eventName, 'eventName', "should pass event name to super");
+                equal(eventPath, 'eventPath', "should pass event path to super");
+                equal(handler, 'handler', "should pass handler to super");
             }
         });
 
-        result = tree.unsubscribeFrom('eventName', 'eventPath', 'handler');
-
-        strictEqual(result, tree, "Is chainable");
+        strictEqual(tree.unsubscribeFrom('eventName', 'eventPath', 'handler'), tree, "should be chainable");
 
         evan.EventSpace.removeMocks();
     });
 
-    test("Unsubscription proxy", function () {
+    test("One time unsubscription proxy", function () {
         expect(4);
 
         var tree = flock.EventedTree.create(),
-            oneTimeHandler = function () {},
-            result;
+            oneTimeHandler = function () {};
 
         evan.EventSpace.addMocks({
             subscribeToUntilTriggered: function (eventName, eventPath, handler) {
-                equal(eventName, 'eventName');
-                equal(eventPath, 'eventPath');
-                equal(handler, 'handler');
+                equal(eventName, 'eventName', "should pass event name to super");
+                equal(eventPath, 'eventPath', "should pass event path to super");
+                equal(handler, 'handler', "should pass handler to super");
                 return oneTimeHandler;
             }
         });
 
-        result = tree.subscribeToUntilTriggered('eventName', 'eventPath', 'handler');
-
-        strictEqual(result, oneTimeHandler, "Returns handler");
+        strictEqual(tree.subscribeToUntilTriggered('eventName', 'eventPath', 'handler'),
+            oneTimeHandler,
+            "should return subscribed handler");
 
         evan.EventSpace.removeMocks();
     });
@@ -347,22 +420,21 @@
         expect(5);
 
         var tree = flock.EventedTree.create(),
-            delegateHandler = function () {},
-            result;
+            delegateHandler = function () {};
 
         evan.EventSpace.addMocks({
             delegateSubscriptionTo: function (eventName, capturePath, delegatePath, handler) {
-                equal(eventName, 'eventName');
-                equal(capturePath, 'capturePath');
-                equal(delegatePath, 'delegatePath');
-                equal(handler, 'handler');
+                equal(eventName, 'eventName', "should pass event name to super");
+                equal(capturePath, 'capturePath', "should pass capture path to super");
+                equal(delegatePath, 'delegatePath', "should pass delegate path to super");
+                equal(handler, 'handler', "should pass handler to super");
                 return delegateHandler;
             }
         });
 
-        result = tree.delegateSubscriptionTo('eventName', 'capturePath', 'delegatePath', 'handler');
-
-        strictEqual(result, delegateHandler, "Returns handler");
+        strictEqual(tree.delegateSubscriptionTo('eventName', 'capturePath', 'delegatePath', 'handler'),
+            delegateHandler,
+            "should return delegate handler");
 
         evan.EventSpace.removeMocks();
     });

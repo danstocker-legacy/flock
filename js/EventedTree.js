@@ -13,7 +13,7 @@ troop.postpone(flock, 'EventedTree', function () {
      */
 
     /**
-     * Evented version of `sntls.Tree`. Whenever a node is changed (by value) the tree emits a `ChangeEvent`.
+     * Evented version of `sntls.Tree`. Whenever a node is changed (by value) the tree emits a `CacheEvent`.
      * When a node is attempted to be read but the path does not exist, an `AccessEvent` is emitted.
      * Offers subscription methods. Works like `sntls.Tree` in all other regards.
      * @class
@@ -28,8 +28,8 @@ troop.postpone(flock, 'EventedTree', function () {
             init: function (items) {
                 base.init.call(this, items);
 
-                /** @type {evan.EventSpace} */
-                this.eventSpace = evan.EventSpace.create();
+                /** @type {flock.CacheEventSpace} */
+                this.eventSpace = flock.CacheEventSpace.create();
             },
 
             /**
@@ -42,7 +42,7 @@ troop.postpone(flock, 'EventedTree', function () {
 
                 if (typeof node === 'undefined') {
                     // triggering event on no value
-                    flock.AccessEvent.create(this.eventSpace)
+                    this.eventSpace.spawnEvent(flock.AccessEvent.EVENT_CACHE_ACCESS)
                         .triggerSync(path);
                 }
 
@@ -58,7 +58,7 @@ troop.postpone(flock, 'EventedTree', function () {
             getSafeNode: function (path, handler) {
                 var that = this;
                 return base.getSafeNode.call(this, path, function (path, afterNode) {
-                    flock.ChangeEvent.create(that.eventSpace)
+                    that.eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
                         .setAfter(afterNode)
                         .triggerSync(path);
 
@@ -80,7 +80,7 @@ troop.postpone(flock, 'EventedTree', function () {
                 base.setNode.call(this, path, value);
 
                 if (value !== beforeNode) {
-                    flock.ChangeEvent.create(this.eventSpace)
+                    this.eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
                         .setBefore(beforeNode)
                         .setAfter(value)
                         .triggerSync(path);
@@ -102,7 +102,7 @@ troop.postpone(flock, 'EventedTree', function () {
                 base.setNode.call(this, path, value);
 
                 if (value !== beforeNode) {
-                    flock.ChangeEvent.create(this.eventSpace)
+                    this.eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
                         .setBefore(beforeNode)
                         .setAfter(value)
                         .broadcastSync(path);
@@ -121,7 +121,7 @@ troop.postpone(flock, 'EventedTree', function () {
             getOrSetNode: function (path, generator, handler) {
                 var that = this;
                 return base.getOrSetNode.call(this, path, generator, function (path, afterNode) {
-                    flock.ChangeEvent.create(that.eventSpace)
+                    that.eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
                         .setAfter(afterNode)
                         .triggerSync(path);
 
@@ -142,7 +142,7 @@ troop.postpone(flock, 'EventedTree', function () {
                 base.unsetNode.call(this, path);
 
                 if (typeof beforeNode !== 'undefined') {
-                    flock.ChangeEvent.create(this.eventSpace)
+                    this.eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
                         .setBefore(beforeNode)
                         .triggerSync(path);
                 }
@@ -164,7 +164,7 @@ troop.postpone(flock, 'EventedTree', function () {
                 base.unsetKey.call(this, path, splice, function (path, afterNode) {
                     if (afterNode) {
                         // FIXME: this is an approximation, as before-splice value is not available
-                        flock.ChangeEvent.create(that.eventSpace)
+                        that.eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
                             .setBefore(afterNode)
                             .setAfter(afterNode)
                             .triggerSync(path);
@@ -173,7 +173,7 @@ troop.postpone(flock, 'EventedTree', function () {
                             handler(path, afterNode);
                         }
                     } else {
-                        flock.ChangeEvent.create(that.eventSpace)
+                        that.eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
                             .setBefore(beforeNode)
                             .triggerSync(path);
 
@@ -199,7 +199,7 @@ troop.postpone(flock, 'EventedTree', function () {
 
                 base.unsetPath.call(this, path, splice, function (path, affectedNode) {
                     // FIXME: this is an approximation, as before-splice value is not available
-                    flock.ChangeEvent.create(that.eventSpace)
+                    that.eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
                         .setBefore(beforeNode)
                         .triggerSync(path);
 

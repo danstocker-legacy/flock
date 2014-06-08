@@ -8,6 +8,8 @@ troop.postpone(flock, 'AccessEvent', function () {
     /**
      * @name flock.AccessEvent.create
      * @function
+     * @param {string} eventName Event name
+     * @param {evan.EventSpace} eventSpace Event space associated with event
      * @returns {flock.AccessEvent}
      */
 
@@ -17,17 +19,18 @@ troop.postpone(flock, 'AccessEvent', function () {
      */
     flock.AccessEvent = self
         .addConstants(/** @lends flock.AccessEvent */{
-            EVENT_NAME_ACCESS: 'eventAccess'
-        })
-        .addMethods(/** @lends flock.ChangeEvent# */{
-            /**
-             * @param {evan.EventSpace} eventSpace Event space associated with event
-             * @ignore
-             */
-            init: function (eventSpace) {
-                base.init.call(this, this.EVENT_NAME_ACCESS, eventSpace);
-            }
+            /** @constant */
+            EVENT_CACHE_ACCESS: 'cache-access'
         });
+});
+
+troop.amendPostponed(evan, 'Event', function () {
+    "use strict";
+
+    evan.Event.addSurrogate(flock, 'AccessEvent', function (eventName, eventSpace) {
+        return flock.CacheEventSpace.isBaseOf(eventSpace) &&
+               eventName === flock.AccessEvent.EVENT_CACHE_ACCESS;
+    });
 });
 
 (function () {

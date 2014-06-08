@@ -6,7 +6,9 @@ troop.postpone(flock, 'ChangeEvent', function () {
         self = base.extend();
 
     /**
+     * Instantiates class.
      * @name flock.ChangeEvent.create
+     * @param {string} eventName Event name
      * @param {evan.EventSpace} eventSpace Event space associated with event
      * @function
      * @returns {flock.ChangeEvent}
@@ -19,15 +21,17 @@ troop.postpone(flock, 'ChangeEvent', function () {
      */
     flock.ChangeEvent = self
         .addConstants(/** @lends flock.ChangeEvent */{
-            EVENT_NAME_CHANGE: 'eventChange'
+            /** @constant */
+            EVENT_CACHE_CHANGE: 'cache-change'
         })
         .addMethods(/** @lends flock.ChangeEvent# */{
             /**
-             * @param {evan.EventSpace} eventSpace Event space associated with event
+             * @param {string} eventName
+             * @param {flock.CacheEventSpace} eventSpace
              * @ignore
              */
-            init: function (eventSpace) {
-                base.init.call(this, this.EVENT_NAME_CHANGE, eventSpace);
+            init: function (eventName, eventSpace) {
+                base.init.call(this, eventName, eventSpace);
 
                 /**
                  * Node value before change.
@@ -80,6 +84,15 @@ troop.postpone(flock, 'ChangeEvent', function () {
                        typeof this.afterValue === 'undefined';
             }
         });
+});
+
+troop.amendPostponed(evan, 'Event', function () {
+    "use strict";
+
+    evan.Event.addSurrogate(flock, 'ChangeEvent', function (eventName, eventSpace) {
+        return flock.CacheEventSpace.isBaseOf(eventSpace) &&
+               eventName === flock.ChangeEvent.EVENT_CACHE_CHANGE;
+    });
 });
 
 (function () {

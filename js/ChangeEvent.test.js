@@ -7,96 +7,140 @@
 
     test("Instantiation", function () {
         var eventSpace = evan.EventSpace.create(),
-            event = /** @type {flock.ChangeEvent} */ flock.ChangeEvent.create(eventSpace);
+            event = /** @type {flock.ChangeEvent} */ flock.ChangeEvent.create(
+                flock.ChangeEvent.EVENT_CACHE_CHANGE,
+                eventSpace);
 
-        equal(event.eventName, flock.ChangeEvent.EVENT_NAME_CHANGE, "Event name");
-        equal(typeof event.beforeValue, 'undefined', "Before value is not defined");
-        equal(typeof event.afterValue, 'undefined', "After value is not defined");
+        equal(typeof event.beforeValue, 'undefined', "should set before value to undefined");
+        equal(typeof event.afterValue, 'undefined', "should set After value is not defined");
     });
 
-    test("Setting beforeValue value", function () {
-        var eventSpace = evan.EventSpace.create(),
-            event = flock.ChangeEvent.create(eventSpace),
+    test("Conversion from Event", function () {
+        var eventSpace = flock.CacheEventSpace.create(),
+            event = evan.Event.create(flock.ChangeEvent.EVENT_CACHE_CHANGE, eventSpace);
+
+        ok(flock.ChangeEvent.isBaseOf(event), "should return ChangeEvent instance");
+    });
+
+    test("Spawning event", function () {
+        var eventSpace = flock.CacheEventSpace.create(),
+            event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE);
+
+        ok(flock.ChangeEvent.isBaseOf(event), "should return ChangeEvent instance");
+    });
+
+    test("Before value setter", function () {
+        var eventSpace = flock.CacheEventSpace.create(),
+            event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE),
             result;
 
         result = event.setBefore('foo');
 
-        strictEqual(result, event, "Is chainable");
-        equal(event.beforeValue, 'foo');
+        strictEqual(result, event, "should be chainable");
+        equal(event.beforeValue, 'foo', "should set before value");
     });
 
-    test("Setting after value", function () {
-        var eventSpace = evan.EventSpace.create(),
-            event = flock.ChangeEvent.create(eventSpace),
+    test("After value setter", function () {
+        var eventSpace = flock.CacheEventSpace.create(),
+            event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE),
             result;
 
         result = event.setAfter('bar');
 
-        strictEqual(result, event, "Is chainable");
-        equal(event.afterValue, 'bar');
+        strictEqual(result, event, "should be chainable");
+        equal(event.afterValue, 'bar', "should set after value");
     });
 
-    test("Flags", function () {
-        var eventSpace = evan.EventSpace.create(),
+    test("Insertion tester", function () {
+        var eventSpace = flock.CacheEventSpace.create(),
             event;
 
-        event = flock.ChangeEvent.create(eventSpace);
-        ok(!event.isInsert(), "Unchanged not insert");
-        ok(!event.isDelete(), "Unchanged not deletion");
+        event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE);
+        ok(!event.isInsert(), "should return false on no before nor after");
 
-        event = flock.ChangeEvent.create(eventSpace)
+        event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
             .setBefore('foo');
-        ok(!event.isInsert(), "Deletion not insert");
-        ok(event.isDelete(), "Deletion");
+        ok(!event.isInsert(), "should return false on before but no after");
 
-        event = flock.ChangeEvent.create(eventSpace)
+        event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
             .setAfter('bar');
-        ok(event.isInsert(), "Insert");
-        ok(!event.isDelete(), "Insert not deletion");
+        ok(event.isInsert(), "should return true on no before but after");
+
+        event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+            .setBefore('foo')
+            .setAfter('bar');
+        ok(!event.isInsert(), "should return false on before and after");
     });
 
-    test("Triggering", function () {
+    test("Deletion tester", function () {
+        var eventSpace = flock.CacheEventSpace.create(),
+            event;
+
+        event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE);
+        ok(!event.isDelete(), "should return false on no before nor after");
+
+        event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+            .setBefore('foo');
+        ok(event.isDelete(), "should return true on before but no after");
+
+        event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+            .setAfter('bar');
+        ok(!event.isDelete(), "should return false on no before but after");
+
+        event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+            .setBefore('foo')
+            .setAfter('bar');
+        ok(!event.isDelete(), "should return false on before and after");
+    });
+
+    test("Triggering event", function () {
         expect(4);
 
-        var eventSpace = evan.EventSpace.create(),
-            event = flock.ChangeEvent.create(eventSpace)
-                .setBefore('hello')
-                .setAfter('world'),
-            customData = {};
+        var eventSpace = flock.CacheEventSpace.create(),
+            beforeValue = {},
+            afterValue = {},
+            event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+                .setBefore(beforeValue)
+                .setAfter(afterValue),
+            path = 'foo>bar'.toPath(),
+            customPayload = {};
 
         evan.Event.addMocks({
-            triggerSync: function (path, data) {
-                equal(path.toString(), 'foo>bar');
-                equal(this.beforeValue, 'hello');
-                equal(this.afterValue, 'world');
-                strictEqual(data, customData);
+            triggerSync: function (eventPath, payload) {
+                strictEqual(eventPath, path, "should trigger event on specified path");
+                strictEqual(this.beforeValue, beforeValue, "should set before value on event");
+                strictEqual(this.afterValue, afterValue, "should set after value on event");
+                strictEqual(payload, customPayload, "should pass custom payload to trigger");
             }
         });
 
-        event.triggerSync('foo>bar'.toPath(), customData);
+        event.triggerSync(path, customPayload);
 
         evan.Event.removeMocks();
     });
 
-    test("Broadcasting", function () {
+    test("Broadcasting event", function () {
         expect(4);
 
-        var eventSpace = evan.EventSpace.create(),
-            event = flock.ChangeEvent.create(eventSpace)
-                .setBefore('hello')
-                .setAfter('world'),
-            customData = {};
+        var eventSpace = flock.CacheEventSpace.create(),
+            beforeValue = {},
+            afterValue = {},
+            event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+                .setBefore(beforeValue)
+                .setAfter(afterValue),
+            path = 'foo>bar'.toPath(),
+            customPayload = {};
 
         evan.Event.addMocks({
-            broadcastSync: function (path, data) {
-                equal(path.toString(), 'foo>bar');
-                equal(this.beforeValue, 'hello');
-                equal(this.afterValue, 'world');
-                strictEqual(data, customData);
+            broadcastSync: function (eventPath, payload) {
+                strictEqual(eventPath, path, "should trigger event on specified path");
+                strictEqual(this.beforeValue, beforeValue, "should set before value on event");
+                strictEqual(this.afterValue, afterValue, "should set after value on event");
+                strictEqual(payload, customPayload, "should pass custom payload to trigger");
             }
         });
 
-        event.broadcastSync('foo>bar'.toPath(), customData);
+        event.broadcastSync(path, customPayload);
 
         evan.Event.removeMocks();
     });
