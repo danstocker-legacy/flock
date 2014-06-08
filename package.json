@@ -1,10 +1,10 @@
 {
     "name"           : "flock",
-    "version"        : "0.2.1",
+    "version"        : "0.3.0",
     "description"    : "Evented key-value cache",
     "keywords"       : ["tree", "xpath", "nosql"],
     "author"         : "Dan Stocker <dan@kwaia.com>",
-    "copyright"      : "Copyright (c) 2011-2013 Dan Stocker",
+    "copyright"      : "Copyright (c) 2011-2014 Dan Stocker",
     "license"        : "MIT",
     "repository"     : {
         "type": "git",
