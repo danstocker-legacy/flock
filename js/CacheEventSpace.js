@@ -12,7 +12,7 @@ troop.postpone(flock, 'CacheEventSpace', function () {
     /**
      * Tree data store specific event space.
      * @class
-     * @extends troop.Base
+     * @extends evan.EventSpace
      */
     flock.CacheEventSpace = evan.EventSpace.extend();
 });
