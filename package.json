@@ -1,6 +1,6 @@
 {
     "name"           : "flock",
-    "version"        : "0.3.1",
+    "version"        : "0.3.2",
     "description"    : "Evented key-value cache",
     "keywords"       : ["tree", "xpath", "nosql"],
     "author"         : "Dan Stocker <dan@kwaia.com>",

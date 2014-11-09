@@ -9,7 +9,8 @@ module.exports = function (grunt) {
             'js/CacheEvent.js',
             'js/ChangeEvent.js',
             'js/AccessEvent.js',
-            'js/EventedTree.js'
+            'js/EventedTree.js',
+            'js/exports.js'
         ],
 
         test: [
