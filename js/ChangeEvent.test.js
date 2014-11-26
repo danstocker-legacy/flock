@@ -29,6 +29,28 @@
         ok(flock.ChangeEvent.isBaseOf(event), "should return ChangeEvent instance");
     });
 
+    test("Cloning", function () {
+        var eventSpace = flock.CacheEventSpace.create(),
+            event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+                .setBefore('foo')
+                .setAfter('bar'),
+            clone = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE),
+            result;
+
+        evan.Event.addMocks({
+            clone: function () {
+                strictEqual(this, event, "should get base clone");
+                return clone;
+            }
+        });
+
+        strictEqual(event.clone(), clone, "should return clone provided by base");
+        equal(event.beforeValue, 'foo', "should set before value on clone");
+        equal(event.afterValue, 'bar', "should set after value on clone");
+
+        evan.Event.removeMocks();
+    });
+
     test("Before value setter", function () {
         var eventSpace = flock.CacheEventSpace.create(),
             event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE),

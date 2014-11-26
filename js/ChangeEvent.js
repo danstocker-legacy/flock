@@ -47,6 +47,16 @@ troop.postpone(flock, 'ChangeEvent', function () {
             },
 
             /**
+             * Clones change event.
+             * @returns {evan.Event}
+             */
+            clone: function () {
+                return base.clone.call(this)
+                    .setBefore(this.beforeValue)
+                    .setAfter(this.afterValue);
+            },
+
+            /**
              * Sets event load before the change.
              * @param {*} value
              * @returns {flock.ChangeEvent}
