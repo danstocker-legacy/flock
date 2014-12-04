@@ -1,6 +1,6 @@
 {
     "name"           : "flock",
-    "version"        : "0.3.4",
+    "version"        : "0.3.5",
     "description"    : "Evented key-value cache",
     "keywords"       : ["tree", "xpath", "nosql"],
     "author"         : "Dan Stocker <dan@kwaia.com>",
@@ -12,7 +12,7 @@
     },
     "dependencies"   : {
         "dessert": "~0.3.2",
-        "troop"  : "~0.7.2",
+        "troop"  : "~0.7.2 || ~0.8.0",
         "sntls"  : "~0.17.0",
         "evan"   : "~0.4.1"
     },
@@ -29,6 +29,8 @@
         "common-gruntfile"    : "git://github.com/danstocker/common-gruntfile.git#0.1.5",
         "QUnitAdapter"        : "https://dl.dropboxusercontent.com/u/9258903/packages/QUnitAdapter-0.1.0.tgz"
     },
-    "files"          : ["flock.js"],
+    "files"          : [
+        "flock.js"
+    ],
     "main"           : "flock.js"
 }
