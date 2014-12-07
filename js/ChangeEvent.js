@@ -22,7 +22,10 @@ troop.postpone(flock, 'ChangeEvent', function () {
     flock.ChangeEvent = self
         .addConstants(/** @lends flock.ChangeEvent */{
             /** @constant */
-            EVENT_CACHE_CHANGE: 'cache-change'
+            EVENT_CACHE_CHANGE: 'cache-change',
+
+            /** @constant */
+            EVENT_CACHE_BEFORE_CHANGE: 'cache-before-change'
         })
         .addMethods(/** @lends flock.ChangeEvent# */{
             /**
@@ -100,8 +103,10 @@ troop.amendPostponed(evan, 'Event', function () {
     "use strict";
 
     evan.Event.addSurrogate(flock, 'ChangeEvent', function (eventName, eventSpace) {
+        var ChangeEvent = flock.ChangeEvent;
         return flock.CacheEventSpace.isBaseOf(eventSpace) &&
-               eventName === flock.ChangeEvent.EVENT_CACHE_CHANGE;
+               eventName === ChangeEvent.EVENT_CACHE_CHANGE ||
+               eventName === ChangeEvent.EVENT_CACHE_BEFORE_CHANGE;
     });
 });
 

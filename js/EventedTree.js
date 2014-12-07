@@ -78,15 +78,22 @@ troop.postpone(flock, 'EventedTree', function () {
              * @returns {flock.EventedTree}
              */
             setNode: function (path, value) {
-                var beforeNode = base.getNode.call(this, path);
-
-                base.setNode.call(this, path, value);
-
-                if (value !== beforeNode) {
-                    this.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+                var beforeNode = base.getNode.call(this, path),
+                    beforeEvent = this.spawnEvent(flock.ChangeEvent.EVENT_CACHE_BEFORE_CHANGE)
                         .setBefore(beforeNode)
                         .setAfter(value)
                         .triggerSync(path);
+
+                if (!beforeEvent.defaultPrevented) {
+                    // default was not prevented
+                    base.setNode.call(this, path, value);
+
+                    if (value !== beforeNode) {
+                        this.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+                            .setBefore(beforeNode)
+                            .setAfter(value)
+                            .triggerSync(path);
+                    }
                 }
 
                 return this;
@@ -100,15 +107,22 @@ troop.postpone(flock, 'EventedTree', function () {
              * @returns {flock.EventedTree}
              */
             setNodeWithBroadcast: function (path, value) {
-                var beforeNode = base.getNode.call(this, path);
-
-                base.setNode.call(this, path, value);
-
-                if (value !== beforeNode) {
-                    this.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+                var beforeNode = base.getNode.call(this, path),
+                    beforeEvent = this.spawnEvent(flock.ChangeEvent.EVENT_CACHE_BEFORE_CHANGE)
                         .setBefore(beforeNode)
                         .setAfter(value)
                         .broadcastSync(path);
+
+                if (!beforeEvent.defaultPrevented) {
+                    // default was not prevented
+                    base.setNode.call(this, path, value);
+
+                    if (value !== beforeNode) {
+                        this.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+                            .setBefore(beforeNode)
+                            .setAfter(value)
+                            .broadcastSync(path);
+                    }
                 }
 
                 return this;
@@ -140,14 +154,20 @@ troop.postpone(flock, 'EventedTree', function () {
              * @returns {flock.EventedTree}
              */
             unsetNode: function (path) {
-                var beforeNode = base.getNode.call(this, path);
-
-                base.unsetNode.call(this, path);
-
-                if (typeof beforeNode !== 'undefined') {
-                    this.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+                var beforeNode = base.getNode.call(this, path),
+                    beforeEvent = this.spawnEvent(flock.ChangeEvent.EVENT_CACHE_BEFORE_CHANGE)
                         .setBefore(beforeNode)
                         .triggerSync(path);
+
+                if (!beforeEvent.defaultPrevented) {
+                    // default was not prevented
+                    base.unsetNode.call(this, path);
+
+                    if (typeof beforeNode !== 'undefined') {
+                        this.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+                            .setBefore(beforeNode)
+                            .triggerSync(path);
+                    }
                 }
 
                 return this;
@@ -162,29 +182,35 @@ troop.postpone(flock, 'EventedTree', function () {
              */
             unsetKey: function (path, splice, handler) {
                 var that = this,
-                    beforeNode = base.getNode.call(this, path);
+                    beforeNode = base.getNode.call(this, path),
+                    beforeEvent = this.spawnEvent(flock.ChangeEvent.EVENT_CACHE_BEFORE_CHANGE)
+                        .setBefore(beforeNode)
+                        .triggerSync(path);
 
-                base.unsetKey.call(this, path, splice, function (path, afterNode) {
-                    if (afterNode) {
-                        // FIXME: this is an approximation, as before-splice value is not available
-                        that.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
-                            .setBefore(afterNode)
-                            .setAfter(afterNode)
-                            .triggerSync(path);
+                if (!beforeEvent.defaultPrevented) {
+                    // default was not prevented
+                    base.unsetKey.call(this, path, splice, function (path, afterNode) {
+                        if (afterNode) {
+                            // FIXME: this is an approximation, as before-splice value is not available
+                            that.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+                                .setBefore(afterNode)
+                                .setAfter(afterNode)
+                                .triggerSync(path);
 
-                        if (handler) {
-                            handler(path, afterNode);
+                            if (handler) {
+                                handler(path, afterNode);
+                            }
+                        } else {
+                            that.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+                                .setBefore(beforeNode)
+                                .triggerSync(path);
+
+                            if (handler) {
+                                handler(path);
+                            }
                         }
-                    } else {
-                        that.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
-                            .setBefore(beforeNode)
-                            .triggerSync(path);
-
-                        if (handler) {
-                            handler(path);
-                        }
-                    }
-                });
+                    });
+                }
 
                 return this;
             },
@@ -198,18 +224,24 @@ troop.postpone(flock, 'EventedTree', function () {
              */
             unsetPath: function (path, splice, handler) {
                 var that = this,
-                    beforeNode = base.getNode.call(this, path);
-
-                base.unsetPath.call(this, path, splice, function (path, affectedNode) {
-                    // FIXME: this is an approximation, as before-splice value is not available
-                    that.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+                    beforeNode = base.getNode.call(this, path),
+                    beforeEvent = this.spawnEvent(flock.ChangeEvent.EVENT_CACHE_BEFORE_CHANGE)
                         .setBefore(beforeNode)
                         .triggerSync(path);
 
-                    if (handler) {
-                        handler(path, affectedNode);
-                    }
-                });
+                if (!beforeEvent.defaultPrevented) {
+                    // default was not prevented
+                    base.unsetPath.call(this, path, splice, function (path, affectedNode) {
+                        // FIXME: this is an approximation, as before-splice value is not available
+                        that.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
+                            .setBefore(beforeNode)
+                            .triggerSync(path);
+
+                        if (handler) {
+                            handler(path, affectedNode);
+                        }
+                    });
+                }
 
                 return this;
             },

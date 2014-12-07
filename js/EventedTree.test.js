@@ -3,7 +3,7 @@
 (function () {
     "use strict";
 
-    module("Evented Tree");
+    module("EventedTree");
 
     test("Instantiation", function () {
         var tree = flock.EventedTree.create();
@@ -90,7 +90,7 @@
     });
 
     test("Node insertion", function () {
-        expect(9);
+        expect(12);
 
         var tree = flock.EventedTree.create(),
             path = 'foo>bar'.toPath(),
@@ -116,6 +116,7 @@
                 strictEqual(eventPath, path, "should trigger change event on specified path");
                 equal(typeof this.beforeValue, 'undefined', "should set before value to undefined");
                 strictEqual(this.afterValue, afterNode, "should set after value to specified node");
+                return this;
             }
         });
 
@@ -127,7 +128,7 @@
 
     // TODO: Add case where afterNode === beforeNode.
     test("Setting node", function () {
-        expect(9);
+        expect(12);
 
         var tree = flock.EventedTree.create(),
             path = 'foo>bar'.toPath(),
@@ -154,6 +155,7 @@
                 strictEqual(eventPath, path, "should trigger change event on specified path");
                 strictEqual(this.beforeValue, beforeNode, "should set before value to previous node");
                 strictEqual(this.afterValue, afterNode, "should set after value to specified node");
+                return this;
             }
         });
 
@@ -165,7 +167,7 @@
 
     // TODO: Add case where afterNode === beforeNode.
     test("Setting node with broadcast", function () {
-        expect(9);
+        expect(12);
 
         var tree = flock.EventedTree.create(),
             path = 'foo>bar'.toPath(),
@@ -192,6 +194,7 @@
                 strictEqual(eventPath, path, "should trigger change event on specified path");
                 strictEqual(this.beforeValue, beforeNode, "should set before value to previous node");
                 strictEqual(this.afterValue, afterNode, "should set after value to specified node");
+                return this;
             }
         });
 
@@ -242,7 +245,7 @@
 
     // TODO: Add case where afterNode === beforeNode.
     test("Node removal", function () {
-        expect(8);
+        expect(11);
 
         var tree = flock.EventedTree.create(),
             path = 'foo>bar'.toPath(),
@@ -267,6 +270,7 @@
                 strictEqual(eventPath, path, "should trigger change event on specified path");
                 strictEqual(this.beforeValue, beforeNode, "should set before value to previous node");
                 equal(typeof this.afterValue, 'undefined', "should set after value to undefined");
+                return this;
             }
         });
 
@@ -278,7 +282,7 @@
 
     // TODO: Add case where splice === true.
     test("Key removal", function () {
-        expect(9);
+        expect(12);
 
         var tree = flock.EventedTree.create(),
             path = 'foo>bar'.toPath(),
@@ -308,6 +312,7 @@
                 strictEqual(eventPath, path, "should trigger change event on specified path");
                 strictEqual(this.beforeValue, beforeNode, "should set before value to previous node");
                 equal(typeof this.afterValue, 'undefined', "should set after value to undefined");
+                return this;
             }
         });
 
@@ -319,7 +324,7 @@
 
     // TODO: Add case where splice === true.
     test("Path removal", function () {
-        expect(9);
+        expect(12);
 
         var tree = flock.EventedTree.create(),
             path = 'foo>bar'.toPath(),
@@ -349,6 +354,7 @@
                 strictEqual(eventPath, path, "should trigger change event on specified path");
                 strictEqual(this.beforeValue, beforeNode, "should set before value to previous node");
                 equal(typeof this.afterValue, 'undefined', "should set after value to undefined");
+                return this;
             }
         });
 

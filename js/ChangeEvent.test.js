@@ -3,7 +3,7 @@
 (function () {
     "use strict";
 
-    module("Change Event");
+    module("ChangeEvent");
 
     test("Instantiation", function () {
         var eventSpace = evan.EventSpace.create(),
@@ -17,8 +17,12 @@
 
     test("Conversion from Event", function () {
         var eventSpace = flock.CacheEventSpace.create(),
-            event = evan.Event.create(flock.ChangeEvent.EVENT_CACHE_CHANGE, eventSpace);
+            event;
 
+        event = evan.Event.create(flock.ChangeEvent.EVENT_CACHE_BEFORE_CHANGE, eventSpace);
+        ok(flock.ChangeEvent.isBaseOf(event), "should return ChangeEvent instance");
+
+        event = evan.Event.create(flock.ChangeEvent.EVENT_CACHE_CHANGE, eventSpace);
         ok(flock.ChangeEvent.isBaseOf(event), "should return ChangeEvent instance");
     });
 
