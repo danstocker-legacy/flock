@@ -1,6 +1,6 @@
 {
     "name"           : "flock",
-    "version"        : "0.3.6",
+    "version"        : "0.3.7",
     "description"    : "Evented key-value cache",
     "keywords"       : [
         "tree", "xpath", "nosql", "evented"
@@ -14,9 +14,9 @@
     },
     "dependencies"   : {
         "dessert": "~0.3.2",
-        "troop"  : "~0.7.2 || ~0.8.0",
-        "sntls"  : "~0.17.0",
-        "evan"   : "~0.4.1"
+        "troop"  : "~0.8.0",
+        "sntls"  : "~0.18.0",
+        "evan"   : "~0.5.0"
     },
     "devDependencies": {
         "phil"                : "~0.2.3",
