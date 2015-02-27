@@ -1,12 +1,12 @@
 {
     "name"           : "flock",
-    "version"        : "0.3.7",
+    "version"        : "0.3.8",
     "description"    : "Evented key-value cache",
     "keywords"       : [
         "tree", "xpath", "nosql", "evented"
     ],
     "author"         : "Dan Stocker <dan@kwaia.com>",
-    "copyright"      : "Copyright (c) 2011-2014 Dan Stocker",
+    "copyright"      : "Copyright (c) 2011-2015 Dan Stocker",
     "license"        : "MIT",
     "repository"     : {
         "type": "git",
@@ -15,8 +15,8 @@
     "dependencies"   : {
         "dessert": "~0.3.2",
         "troop"  : "~0.8.0",
-        "sntls"  : "~0.18.0",
-        "evan"   : "~0.5.0"
+        "sntls"  : "~0.18.0 || ~0.19.0",
+        "evan"   : "~0.6.0"
     },
     "devDependencies": {
         "phil"                : "~0.2.3",
