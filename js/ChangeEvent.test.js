@@ -120,7 +120,7 @@
     });
 
     test("Triggering event", function () {
-        expect(4);
+        expect(3);
 
         var eventSpace = flock.CacheEventSpace.create(),
             beforeValue = {},
@@ -128,19 +128,17 @@
             event = eventSpace.spawnEvent(flock.ChangeEvent.EVENT_CACHE_CHANGE)
                 .setBefore(beforeValue)
                 .setAfter(afterValue),
-            path = 'foo>bar'.toPath(),
-            customPayload = {};
+            path = 'foo>bar'.toPath();
 
         evan.Event.addMocks({
             triggerSync: function (eventPath, payload) {
                 strictEqual(eventPath, path, "should trigger event on specified path");
                 strictEqual(this.beforeValue, beforeValue, "should set before value on event");
                 strictEqual(this.afterValue, afterValue, "should set after value on event");
-                strictEqual(payload, customPayload, "should pass custom payload to trigger");
             }
         });
 
-        event.triggerSync(path, customPayload);
+        event.triggerSync(path);
 
         evan.Event.removeMocks();
     });
